@@ -6,7 +6,6 @@ This is a simple Discord bot that allows users to play music from various source
 
 - Play music from YouTube, Spotify, SoundCloud, etc. in a voice channel
 - Add songs to a queue to be played in order
-- Skip the currently playing song
 
 ## Commands
 
@@ -16,5 +15,5 @@ This is a simple Discord bot that allows users to play music from various source
 ## Setup
 
 1. Clone this repository and install the dependencies by running `npm install`.
-2. Create a `.env` file in the root directory of the project and add your bot token as an environment variable named `TOKEN`.
+2. Create a `.env` file in the root directory of the project and add your bot token as an environment variable named `token` and `clientId`.
 3. Run the bot by running `node index.js`.
