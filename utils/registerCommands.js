@@ -19,7 +19,21 @@ async function registerCommands(clientId, token) {
         option.setName('song')
           .setDescription('Add song from YouTube, Spotify, SoundCloud, etc. to the queue')
           .setRequired(true)
-      )
+      ),
+    new SlashCommandBuilder()
+        .setName('pause')
+        .setDescription('Pauses the current song!'),
+    new SlashCommandBuilder()
+        .setName('resume')
+        .setDescription('Resumes the current song!'),   
+    new SlashCommandBuilder()
+        .setName('loop')
+        .setDescription('Loops the current song!')
+        .addBooleanOption(option =>
+            option.setName('looping')
+                .setDescription('Enable or disable looping')
+                .setRequired(true)
+        )
   ];
 
   const rest = new REST({ version: '9' }).setToken(token);
