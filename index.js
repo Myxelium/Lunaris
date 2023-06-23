@@ -1,9 +1,12 @@
-const { playCommand } = require('./play.js');
 const { Client, GatewayIntentBits } = require('discord.js');
-const { queueCommand } = require('./commands/queue');
 const { registerCommands } = require('./utils/registerCommands');
-const process = require('dotenv').config();
+const { playCommand } = require('./commands/play');
+const { queueCommand } = require('./commands/queue');
+const { pauseCommand } = require('./commands/pause');
+const { resumeCommand } = require('./commands/resume');
+const { loopCommand } = require('./commands/loop');
 
+const process = require('dotenv').config();
 const clientId = process.parsed.clientId;
 const token = process.parsed.token;
 
@@ -31,8 +34,14 @@ client.on('interactionCreate', async (interaction) => {
       await playCommand(interaction);
     } else if (commandName === 'queue') {
       await queueCommand(interaction);
+    } else if (commandName === 'pause') {
+      await pauseCommand(interaction);
+    } else if (commandName === 'resume') {
+      await resumeCommand(interaction);
+    } else if (commandName === 'loop') {
+      await loopCommand(interaction);
     }
-});
+  });
   
 
 // client.login(process.env.TOKEN);

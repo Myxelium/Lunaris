@@ -24,10 +24,10 @@ async function getMusicStream(query) {
     type = StreamType.OggOpus;
     
   } else {
-    stream = await youtube.getStream(query);
-    songTitle = stream.title ?? 'Unknown';
-    songDuration = stream.duration ?? 'Unknown';
-    stream = stream.stream;
+    stream = await youtube.getStream(query)
+    songTitle = stream?.title ?? 'Unknown';
+    songDuration = stream?.duration ?? 'Unknown';
+    stream = stream?.stream;
     type = StreamType.Opus;
   }
 
