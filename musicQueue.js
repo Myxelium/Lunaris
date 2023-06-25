@@ -45,6 +45,14 @@ class MusicQueue {
   disableLooping(guildId) {
     this.looping.set(guildId, false);
   }
+
+  clearQueue(guildId) {
+    if (!this.queue.has(guildId)) {
+      return;
+    }
+
+    this.queue.set(guildId, []);
+  }
 }
 
 module.exports = new MusicQueue();

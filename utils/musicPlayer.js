@@ -1,22 +1,25 @@
-const { 
-    createAudioResource, 
-    createAudioPlayer, 
+const {
+    createAudioResource,
+    createAudioPlayer,
     NoSubscriberBehavior,
     AudioPlayerStatus,
 } = require('@discordjs/voice');
+
+const { EmbedBuilder } = require('discord.js');
 const musicQueue = require('../musicQueue');
-  
+const { progressBar } = require('../utils/progress');
+
 async function musicPlayer(guildId, connection, interaction) {
     const serverQueue = musicQueue.getQueue(guildId);
-  
+
     if (serverQueue.length === 0) {
-      connection.destroy();
-      return;
+        connection.destroy();
+        return;
     }
-  
+
     const song = serverQueue[0];
-  
-    if(song.stream == null){
+
+    if (song.stream == null) {
         musicQueue.removeFromQueue(guildId);
         musicPlayer(guildId, connection);
         return;
@@ -25,7 +28,7 @@ async function musicPlayer(guildId, connection, interaction) {
     let resource = createAudioResource(song.stream, {
         inputType: song.type
     })
-  
+
     let player = createAudioPlayer({
         behaviors: {
             noSubscriber: NoSubscriberBehavior.Play
@@ -33,16 +36,36 @@ async function musicPlayer(guildId, connection, interaction) {
     })
 
     player.play(resource)
-  
+
     connection.subscribe(player)
-    interaction.followUp(`Added **${song.title}** to the queue.`).then(message => 
-        setTimeout(() => 
-            message.delete(), 
-            song.duration + 10000));
+
+    progressBar(0, 0, true)
+
+    if(interaction.commandName == "play") {
+        interaction.followUp(`~🎵~`).then(message => {
+            const embed = new EmbedBuilder()
+                .setColor("#E0B0FF")
+                .setTitle("Now playing: " + song.title)
+                .setDescription(progressBar(song.duration, 10).progressBarString);
+        
+            message.edit({ embeds: [embed] });
+        
+            inter = setInterval(() => {
+                const { progressBarString, isDone } = progressBar(song.duration, 10);
+                if (isDone) {
+                    clearInterval(inter);
+                    message.delete();
+                }
+                embed.setDescription(progressBarString);
+                message.edit({ embeds: [embed] });
+            }, 2000)
+        });   
+    }
 
     player.on(AudioPlayerStatus.Idle, async () => {
-      console.log('Song ended:', song.title);
-      await musicQueue.removeFromQueue(guildId)
+        console.log('Song ended:', song.title);
+        await musicQueue.removeFromQueue(guildId)
+        musicPlayer(guildId, connection, interaction);
     });
 
     return player;

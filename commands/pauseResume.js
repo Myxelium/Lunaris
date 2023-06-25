@@ -1,23 +1,33 @@
-const { getVoiceConnection } = require('@discordjs/voice');
+const { getVoiceConnection } = require("@discordjs/voice");
 
 async function pauseCommand(interaction) {
     await interaction.deferReply();
+
     const connection = getVoiceConnection(interaction.guild.id);
+
     if (!connection) {
-        return interaction.followUp('There is no active music player in this server.');
+        return interaction.followUp(
+            "There is no active music player in this server."
+        );
     }
+
     connection.state.subscription.player.pause();
-    interaction.followUp('Paused the music.');
+    interaction.followUp("Paused the music.");
 }
 
 async function unpauseCommand(interaction) {
     await interaction.deferReply();
+
     const connection = getVoiceConnection(interaction.guild.id);
+
     if (!connection) {
-        return interaction.followUp('There is no active music player in this server.');
+        return interaction.followUp(
+            "There is no active music player in this server."
+        );
     }
+
     connection.state.subscription.player.unpause();
-    interaction.followUp('Unpaused the music.');
+    interaction.followUp("Resumed the music.");
 }
 
 module.exports.pauseCommand = pauseCommand;

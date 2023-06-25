@@ -1,14 +1,14 @@
-const playdl = require('play-dl');
+const playdl = require("play-dl");
 
 async function getStream(query) {
-    let songInformation = await playdl.soundcloud(query) // Make sure that url is track url only. For playlist, make some logic.
+    let songInformation = await playdl.soundcloud(query);
     let stream = await playdl.stream_from_info(songInformation, { quality: 2 });
     return {
         title: songInformation.name,
         stream: stream.stream,
-        duration: songInformation.durationInSec / 1000,
-        userInput: query
-    }
+        duration: songInformation.durationInSec * 1000,
+        userInput: query,
+    };
 }
 
 module.exports.getStream = getStream;
