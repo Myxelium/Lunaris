@@ -9,6 +9,7 @@ async function getMusicStream(query) {
   let songTitle;
   let songDuration;
   let type = StreamType.Opus;
+  let userInput = query;
 
   if (query.includes('spotify.com')) {
     stream = await spotify.getStream(query);
@@ -34,6 +35,7 @@ async function getMusicStream(query) {
   return {
     title: songTitle,
     duration: songDuration,
+    userInput: userInput,
     stream: stream,
     type: type
   };

@@ -6,33 +6,33 @@ async function getStream(query) {
         const regex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&\n]+)/;
         const match = query.match(regex);
         let videoId;
-
+        let usingYtsr = false;
         if(match == null) {
-            const searchResults = await ytsr(query, { page: 1, type: 'video' });
-            videoId = searchResults.items[0].id;
-            // videoId = null;
-
-            console.log(searchResults.items[0].id)
+            let result = await playdl.search(query, { limit: 1});
+            videoId = result[0].id;
 
             if (videoId == null) {
-                let result = await playdl.search(query, { limit: 1})
-                let videoUrl = result[0].url;
-                videoId = videoUrl.match(regex)[1];
+                usingYtsr = true;
+                const searchResults = await ytsr(query, { page: 1, type: 'video' });
+                videoId = searchResults.items[0].id;
             }
         } else {
             videoId = match[1];
         }
 
         const streamResult = await playdl.stream(`https://www.youtube.com/watch?v=${videoId}`, { quality: 2 });
-        const infoResult = await ytsr(`https://www.youtube.com/watch?v=${videoId}`, { limit: 1});
-
+        const infoResult = usingYtsr ? await ytsr(`https://www.youtube.com/watch?v=${videoId}`, { limit: 1}) : await playdl.video_info(`https://www.youtube.com/watch?v=${videoId}`);
+        console.log(infoResult)
+        console.log("\x1b[36m",' Id: ', videoId, 'Alternative search:', usingYtsr)
         return {
-            title: infoResult.items[0].title ?? 'Unknown',
-            duration: infoResult.items[0].duration ?? 0,
+            title: (usingYtsr ? infoResult.items[0].title : infoResult.video_details.title) ?? 'Unknown, error fetching title.',
+            duration: (usingYtsr ? infoResult.items[0].duration : infoResult.video_details.durationInSec) ?? 'Unknown, error fetching duration.',
             stream: streamResult.stream,
-            type: streamResult.type
+            type: streamResult.type,
+            userInput: query
         };
     } catch (error) {
+        console.log("\x1b[31m", error);
         return null;
     }
 }

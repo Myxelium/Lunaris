@@ -28,12 +28,7 @@ async function registerCommands(clientId, token) {
         .setDescription('Resumes the current song!'),   
     new SlashCommandBuilder()
         .setName('loop')
-        .setDescription('Loops the current song!')
-        .addBooleanOption(option =>
-            option.setName('looping')
-                .setDescription('Enable or disable looping')
-                .setRequired(true)
-        )
+        .setDescription('Loops the current song! (toggle)'),
   ];
 
   const rest = new REST({ version: '9' }).setToken(token);

@@ -2,9 +2,9 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { registerCommands } = require('./utils/registerCommands');
 const { playCommand } = require('./commands/play');
 const { queueCommand } = require('./commands/queue');
-const { pauseCommand } = require('./commands/pause');
-const { resumeCommand } = require('./commands/resume');
-const { loopCommand } = require('./commands/loop');
+const { pauseCommand, unpauseCommand } = require('./commands/pause_resume');
+const { toggleLoopCommand } = require('./commands/loop');
+const { ReAuth } = require('./ReAuthenticate');
 
 const process = require('dotenv').config();
 const clientId = process.parsed.clientId;
@@ -37,12 +37,16 @@ client.on('interactionCreate', async (interaction) => {
     } else if (commandName === 'pause') {
       await pauseCommand(interaction);
     } else if (commandName === 'resume') {
-      await resumeCommand(interaction);
+      await unpauseCommand(interaction);
     } else if (commandName === 'loop') {
-      await loopCommand(interaction);
+      await toggleLoopCommand(interaction);
     }
   });
   
+  client.on('messageCreate', async (message) => {
+    if(message.content == 'reauth') {
+      await ReAuth();
+    }
+  });
 
-// client.login(process.env.TOKEN);
 client.login(token);

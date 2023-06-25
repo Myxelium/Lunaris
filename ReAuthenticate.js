@@ -1,8 +1,9 @@
 const play = require('play-dl');
 
-if (play.is_expired()) {
+async function ReAuth() {
+/*if (play.is_expired()) {
     await play.refreshToken()
-}
+}*/
 
 play.getFreeClientID().then((clientID) => {
     play.setToken({
@@ -15,4 +16,6 @@ play.getFreeClientID().then((clientID) => {
 })
 
 play.authorization();
+}
 
+module.exports.ReAuth = ReAuth;

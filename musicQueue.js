@@ -1,3 +1,5 @@
+const { getMusicStream } = require('./utils/getMusicStream');
+
 class MusicQueue {
   constructor() {
     this.queue = new Map();
@@ -12,7 +14,7 @@ class MusicQueue {
     this.queue.get(guildId).push(song);
   }
 
-  removeFromQueue(guildId) {
+  async removeFromQueue(guildId) {
     if (!this.queue.has(guildId)) {
       return;
     }
@@ -20,7 +22,9 @@ class MusicQueue {
     const serverQueue = this.queue.get(guildId);
 
     if (this.looping.has(guildId) && this.looping.get(guildId)) {
-      serverQueue.push(serverQueue.shift());
+      const song = serverQueue.shift();
+      const newSong = await getMusicStream(song.userInput);
+      serverQueue.push(newSong);
     } else {
       serverQueue.shift();
     }
@@ -34,8 +38,12 @@ class MusicQueue {
     return this.queue.get(guildId);
   }
 
-  setLooping(guildId, looping) {
-    this.looping.set(guildId, looping);
+  enableLooping(guildId) {
+    this.looping.set(guildId, true);
+  }
+
+  disableLooping(guildId) {
+    this.looping.set(guildId, false);
   }
 }
 

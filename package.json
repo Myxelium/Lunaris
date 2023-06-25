@@ -4,7 +4,8 @@
   "description": "Discord music bot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -25,11 +26,8 @@
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
     "ffmpeg-static": "^4.2.7",
-    "libsodium-wrappers": "^0.7.11",
     "opusscript": "^0.1.0",
     "play-dl": "^1.9.6",
-    "sodium": "^3.0.2",
-    "sodium-native": "^4.0.4",
     "soundcloud-scraper": "^5.0.3",
     "spotify-web-api-node": "^5.0.2",
     "tweetnacl": "^1.0.3",

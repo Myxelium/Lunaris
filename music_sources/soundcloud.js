@@ -6,7 +6,8 @@ async function getStream(query) {
     return {
         title: songInformation.name,
         stream: stream.stream,
-        duration: songInformation.durationInSec
+        duration: songInformation.durationInSec / 1000,
+        userInput: query
     }
 }
 

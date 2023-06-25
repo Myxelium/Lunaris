@@ -27,9 +27,7 @@ async function playCommand(interaction) {
           selfMute: false
         });
       
-        musicPlayer(interaction.guild.id, connection);
-      
-        interaction.followUp(`Added ${song.title} to the queue.`);
+        musicPlayer(interaction.guild.id, connection, interaction);
 }
 
 module.exports.playCommand = playCommand;
