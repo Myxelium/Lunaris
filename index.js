@@ -5,7 +5,7 @@ const { queueCommand } = require('./commands/queue');
 const { stopCommand } = require('./commands/stop');
 const { pauseCommand, unpauseCommand } = require('./commands/pauseResume');
 const { toggleLoopCommand } = require('./commands/loop');
-const { ReAuth } = require('./ReAuthenticate');
+const { ReAuth } = require('./reAuthenticate');
 
 const process = require('dotenv').config();
 const clientId = process.parsed.clientId;
