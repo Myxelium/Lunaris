@@ -1,20 +1,25 @@
-const { playCommand } = require('./play.js');
 const { Client, GatewayIntentBits } = require('discord.js');
-const { queueCommand } = require('./commands/queue');
 const { registerCommands } = require('./utils/registerCommands');
-const process = require('dotenv').config();
+const { playCommand } = require('./commands/play');
+const { queueCommand } = require('./commands/queue');
+const { stopCommand } = require('./commands/stop');
+const { pauseCommand, unpauseCommand } = require('./commands/pauseResume');
+const { toggleLoopCommand } = require('./commands/loop');
+const { ReAuth } = require('./ReAuthenticate');
 
+const process = require('dotenv').config();
 const clientId = process.parsed.clientId;
 const token = process.parsed.token;
 
 const client = new Client({ 
-    intents: [
-        GatewayIntentBits.Guilds, 
-        GatewayIntentBits.GuildMessages, 
-        GatewayIntentBits.MessageContent, 
-        GatewayIntentBits.GuildVoiceStates, 
-        GatewayIntentBits.GuildIntegrations
-    ] })
+  intents: [
+      GatewayIntentBits.Guilds, 
+      GatewayIntentBits.GuildMessages, 
+      GatewayIntentBits.MessageContent, 
+      GatewayIntentBits.GuildVoiceStates, 
+      GatewayIntentBits.GuildIntegrations
+  ]
+})
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -23,17 +28,29 @@ client.on('ready', async () => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isCommand()) return;
-  
-    const { commandName } = interaction;
-  
-    if (commandName === 'play') {
-      await playCommand(interaction);
-    } else if (commandName === 'queue') {
-      await queueCommand(interaction);
-    }
+  if (!interaction.isCommand()) return;
+
+  const { commandName } = interaction;
+
+  if (commandName === 'play') {
+    await playCommand(interaction);
+  } else if (commandName === 'queue') {
+    await queueCommand(interaction);
+  } else if (commandName === 'pause') {
+    await pauseCommand(interaction);
+  } else if (commandName === 'resume') {
+    await unpauseCommand(interaction);
+  } else if (commandName === 'loop') {
+    await toggleLoopCommand(interaction);
+  } else if (commandName === 'stop') {
+    await stopCommand(interaction);
+  }
 });
   
+client.on('messageCreate', async (message) => {
+  if(message.content == 'reauth') {
+    await ReAuth();
+  }
+});
 
-// client.login(process.env.TOKEN);
 client.login(token);

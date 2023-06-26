@@ -9,6 +9,7 @@ async function getMusicStream(query) {
   let songTitle;
   let songDuration;
   let type = StreamType.Opus;
+  let userInput = query;
 
   if (query.includes('spotify.com')) {
     stream = await spotify.getStream(query);
@@ -24,16 +25,17 @@ async function getMusicStream(query) {
     type = StreamType.OggOpus;
     
   } else {
-    stream = await youtube.getStream(query);
-    songTitle = stream.title ?? 'Unknown';
-    songDuration = stream.duration ?? 'Unknown';
-    stream = stream.stream;
+    stream = await youtube.getStream(query)
+    songTitle = stream?.title ?? 'Unknown';
+    songDuration = stream?.duration ?? 'Unknown';
+    stream = stream?.stream;
     type = StreamType.Opus;
   }
 
   return {
     title: songTitle,
     duration: songDuration,
+    userInput: userInput,
     stream: stream,
     type: type
   };
