@@ -1,0 +1,10 @@
+{
+    "prettier.useTabs": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true
+      },
+    "eslint.validate": ["javascript"]
+
+    // "editor.formatOnSave": true,
+    // "eslint.format.enable": true
+}
