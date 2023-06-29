@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "lint": "eslint --fix --ext .js,.jsx ."
+    "lint": "eslint --fix --ext .js,.jsx .",
+    "start-server": "pm2 start Lunaris",
+    "stop-server": "pm2 stop Lunaris",
+    "updater": "node maintenance.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +32,8 @@
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
     "ffmpeg-static": "^4.2.7",
+    "lodash": "^4.17.21",
+    "node-schedule": "^2.1.1",
     "opusscript": "^0.1.0",
     "play-dl": "^1.9.6",
     "soundcloud-scraper": "^5.0.3",
