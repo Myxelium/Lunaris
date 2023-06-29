@@ -13,7 +13,7 @@ schedule.scheduleJob('0 1 * * *', () => {
             return;
         }
         if (stdout.includes('[new branch]')) {
-            exec('pm2 stop Lunaris', (error, stdout, stderr) => {
+            exec('pm2 stop index.js', (error, stdout, stderr) => {
                 if (error) {
                     console.error(`exec error: ${error}`);
                     return;
@@ -25,7 +25,7 @@ schedule.scheduleJob('0 1 * * *', () => {
                     }
                     const now = new Date();
                     console.log(`Repository updated at ${now.toLocaleString()}`);
-                    exec('pm2 start Lunaris', (error, stdout, stderr) => {
+                    exec('pm2 start index.js', (error, stdout, stderr) => {
                         if (error) {
                             console.error(`exec error: ${error}`);
                             return;
