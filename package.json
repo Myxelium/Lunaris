@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "lint": "eslint --fix --ext .js,.jsx .",
-    "start-server": "pm2 start Lunaris",
-    "stop-server": "pm2 stop Lunaris",
+    "start-server": "pm2 start index.js",
+    "stop-server": "pm2 stop index.js",
     "updater": "node maintenance.js"
   },
   "repository": {
