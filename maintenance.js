@@ -1,5 +1,3 @@
-Sure, here is an updated version of the script that will log the date and time when the repository was updated:
-
 const { exec } = require('child_process');
 const schedule = require('node-schedule');
 
