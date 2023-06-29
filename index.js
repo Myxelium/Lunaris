@@ -24,6 +24,7 @@ const client = new Client({
 
 client.on('ready', async () => {
 	console.log(`Logged in as ${client.user.tag}!`);
+	client.user.setActivity('Use /play to play music.');
 
 	await registerCommands(clientId, token);
 });
