@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const process = require('dotenv').config();
+const { getVoiceConnection } = require('@discordjs/voice');
 const { registerCommands } = require('./utils/registerCommands');
 const { playCommand } = require('./commands/play');
 const { queueCommand } = require('./commands/queue');
@@ -25,6 +26,17 @@ client.on('ready', async () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 
 	await registerCommands(clientId, token);
+});
+
+client.on('voiceStateUpdate', (oldState) => {
+	const voiceChannel = oldState.channel;
+	if (voiceChannel && voiceChannel.members.size === 1) {
+		const connection = getVoiceConnection(voiceChannel.guild.id);
+		if (connection) {
+			connection.disconnect();
+			connection.destroy();
+		}
+	}
 });
 
 client.on('interactionCreate', async (interaction) => {
