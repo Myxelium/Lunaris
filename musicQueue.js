@@ -6,12 +6,18 @@ class MusicQueue {
 		this.looping = new Map();
 	}
 
-	addToQueue(guildId, song) {
+	addToQueue(guildId, song, front = false) {
 		if (!this.queue.has(guildId)) {
 			this.queue.set(guildId, []);
 		}
 
-		this.queue.get(guildId).push(song);
+		if (front) {
+		// Add the song to the front of the queue
+			this.queue.get(guildId).unshift(song);
+		} else {
+		// Add the song to the end of the queue
+			this.queue.get(guildId).push(song);
+		}
 	}
 
 	async removeFromQueue(guildId) {
@@ -36,6 +42,15 @@ class MusicQueue {
 		}
 
 		return this.queue.get(guildId);
+	}
+
+	async addToQueueFirst(guildId, song) {
+		if (!this.queue.has(guildId)) {
+			this.queue.set(guildId, []);
+		}
+
+		this.removeFromQueue(guildId);
+		this.queue.get(guildId).unshift(song);
 	}
 
 	enableLooping(guildId) {

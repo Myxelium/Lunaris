@@ -10,80 +10,23 @@ const process = require('dotenv').config();
 
 const { clientId } = process.parsed;
 
-const { EmbedBuilder } = require('discord.js');
 const musicQueue = require('../musicQueue');
-const { progressBar } = require('./progress');
+const { nowPlayingMessage, intervalMap, currentInteractionIds } = require('./nowPlayingMessage');
+const ConsolerLogger = require('./logger');
 
-const currentInteractionIds = new Map();
-const currentInteractions = new Map();
 const oldConnections = [];
 const timeoutTimer = new Map();
-
-// TODO FIX THIS SHIT!!! ISSUES WITH DISPLAYING NAME AND STATUS WHEN UPDATING
-function nowPLayingMessage(interaction, song, oldInteractionId) {
-	progressBar(0, 0, true);
-
-	if (interaction.commandName === 'play') {
-		interaction.followUp('~🎵~').then((message) => {
-			const songTitle = song.title;
-			// const embed = new EmbedBuilder()
-			// 	.setColor('#E0B0FF')
-			// 	.setTitle(`Now playing: ${songTitle}`)
-			// 	.setDescription(
-			// 		progressBar(song.duration, 10).progressBarString,
-			// 	);
-			const embed = new EmbedBuilder()
-				.setColor('#E0B0FF')
-				.setTitle(`Now playing: ${songTitle}`);
-
-			message.edit({
-				embeds: [embed],
-			});
-
-			const inter = setInterval(async () => {
-				const { progressBarString, isDone } = progressBar(
-					song.duration,
-					10,
-				);
-				if (isDone || message.id !== oldInteractionId) {
-					// clearInterval(inter);
-					return;
-				}
-
-				if (message.id != null && interaction.guild.id !== oldInteractionId) {
-					interaction.channel.messages.fetch().then(async (channel) => {
-						const filter = channel.filter((msg) => msg.author.id === clientId);
-						const latestMessage = await interaction.channel.messages.fetch(filter.first().id);
-						latestMessage.edit({
-							embeds: [embed.setTitle(`Now playing: ${songTitle}`)],
-						});
-					});
-				}
-			}, 2000);
-
-			currentInteractionIds.set(interaction.guild.id, interaction);
-			currentInteractions.set(interaction.guild.id, interaction.id);
-		});
-	}
-}
+const logger = new ConsolerLogger();
 
 async function musicPlayer(guildId, connection, interaction) {
 	try {
-		const oldInteractions = await currentInteractions.get(interaction.guild.id);
 		const oldInteractionId = await currentInteractionIds.get(interaction.guild.id);
 		const serverQueue = musicQueue.getQueue(guildId);
 		const oldConnection = oldConnections
 			.find((guidConnection) => guidConnection[0] === interaction.guild.id);
-
-		if (serverQueue.length === 0) {
-			oldConnection[1].destroy();
-		}
-
 		const song = serverQueue[0];
 
-		if (song.stream === undefined) {
-			musicQueue.removeFromQueue(guildId);
-			musicPlayer(guildId, connection);
+		if (!song || song.stream === undefined) {
 			return;
 		}
 
@@ -97,30 +40,44 @@ async function musicPlayer(guildId, connection, interaction) {
 			},
 		});
 
-		player.play(resource);
+		if (!resource.ended) {
+			player.play(resource);
+		} else {
+			logger.warning('Song ended prematurely.', song.title);
+		}
 
 		connection.subscribe(player);
 
-		nowPLayingMessage(interaction, song, oldInteractions);
+		nowPlayingMessage(interaction, song);
 
 		oldConnections.push([interaction.guild.id, connection]);
 
+		// Add an event listener for the Idle event of the audio player
 		player.on(AudioPlayerStatus.Idle, async () => {
-			console.log('Song ended:', song.title);
-			if (serverQueue.length !== 1) {
-				await musicQueue.removeFromQueue(guildId);
-				musicPlayer(guildId, connection, interaction);
-			}
+			logger.info(`Song ended: ${song.title}`, 'Started by:', interaction.user.username);
+			// Check if the audio resource has ended
+			if (resource.ended) {
+				// If the audio resource has ended, play the next song
 
-			// timeoutTimer.set(guildId, setTimeout(async () => {
-			// 	await musicQueue.removeFromQueue(guildId);
-			// 	connection.destroy();
-			// }, 10000));
+				if (serverQueue.length !== 0) {
+					await musicQueue.removeFromQueue(guildId);
+					musicPlayer(guildId, connection, interaction);
+					logger.info(`Playing next song...${serverQueue}`);
+				} else {
+					// If there are no more songs in the queue, destroy the connection
+					connection.destroy();
+					logger.info('Connection destroyed.');
+					// Clear the interval for updating the progress bar
+					const interval = intervalMap.get(interaction.guild.id);
+					clearInterval(interval);
+				}
+			}
 		});
 
 		player.on(AudioPlayerStatus.Playing, () => {
-			console.log('pausing timer');
+			logger.info(`Playing: ${song.title}, Started by: ${interaction.user.username}`);
 			clearTimeout(
+				logger.info('Previous song timer cleared.'),
 				timeoutTimer.get(guildId),
 			);
 		});
@@ -130,13 +87,15 @@ async function musicPlayer(guildId, connection, interaction) {
 				const { lastMessage } = oldInteractionId.channel;
 				const filter = channel.filter((message) => message.author.id === clientId && message.id !== lastMessage.id);
 				setTimeout(() => {
-					oldInteractionId.channel.bulkDelete(filter);
+					logger.info('Removing old messages...');
+					oldInteractionId.channel.bulkDelete(filter)
+						.catch((error) => logger.error(error));
 				}, 1000);
 			});
 		}
 	} catch (error) {
-		console.error(error);
-		interaction.followUp('There was an error playing the song.');
+		logger.error(error);
+		interaction.followUp('There was an error playing the song.', { ephemeral: true });
 	}
 }
 

@@ -1,6 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
+const ConsolerLogger = require('./logger');
+
+const logger = new ConsolerLogger();
 
 async function registerCommands(clientId, token) {
 	const commands = [
@@ -32,6 +35,15 @@ async function registerCommands(clientId, token) {
 		new SlashCommandBuilder()
 			.setName('stop')
 			.setDescription('Stops the current song!'),
+		new SlashCommandBuilder()
+			.setName('skip')
+			.setDescription('Skips the current song!'),
+		new SlashCommandBuilder()
+			.setName('leave')
+			.setDescription('Leaves the voice channel!'),
+		new SlashCommandBuilder()
+			.setName('previous')
+			.setDescription('Plays the previous song!'),
 	];
 
 	const rest = new REST({
@@ -40,15 +52,15 @@ async function registerCommands(clientId, token) {
 		.setToken(token);
 
 	try {
-		console.log('\x1b[35m', 'Started refreshing application (/) commands.');
+		logger.register('Started refreshing application (/) commands.');
 
 		await rest.put(Routes.applicationCommands(clientId), {
 			body: commands,
 		});
 
-		console.log('\x1b[35m', 'Successfully reloaded application (/) commands.');
+		logger.register('Successfully reloaded application (/) commands.');
 	} catch (error) {
-		console.error(error);
+		logger.error('Failed to reload application (/) commands.');
 	}
 }
 

@@ -1,5 +1,8 @@
 const ytsr = require('ytsr');
 const playdl = require('play-dl');
+const ConsolerLogger = require('../utils/logger');
+
+const logger = new ConsolerLogger();
 
 async function getStream(query) {
 	try {
@@ -35,7 +38,15 @@ async function getStream(query) {
 			: await playdl.video_info(
 				`https://www.youtube.com/watch?v=${videoId}`,
 			);
-		console.log('\x1b[36m', ' Id: ', videoId, 'Alternative search:', usingYtsr);
+
+		logger.info('Search request', { file: 'Youtube.JS',
+			Id: videoId,
+			alternativeSearch: usingYtsr,
+			length: usingYtsr
+				? infoResult.items[0].duration
+				: infoResult.video_details.durationInSec / 60,
+			SearchQuery: query });
+
 		return {
 			title:
 				(usingYtsr
@@ -52,7 +63,7 @@ async function getStream(query) {
 			userInput: query,
 		};
 	} catch (error) {
-		console.log('\x1b[31m', error);
+		logger.error(error);
 		return null;
 	}
 }

@@ -7,12 +7,17 @@ const { queueCommand } = require('./commands/queue');
 const { stopCommand } = require('./commands/stop');
 const { pauseCommand, unpauseCommand } = require('./commands/pauseResume');
 const { toggleLoopCommand } = require('./commands/loop');
+const { skipCommand } = require('./commands/skip');
+const { leaveCommand } = require('./commands/leave');
+const { previousCommand } = require('./commands/previous');
 const { ReAuth } = require('./reAuthenticate');
+const ConsolerLogger = require('./utils/logger');
 
 const { clientId } = process.parsed;
 const { token } = process.parsed;
 
-const client = new Client({
+const logger = new ConsolerLogger();
+const botClient = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMessages,
@@ -22,14 +27,14 @@ const client = new Client({
 	],
 });
 
-client.on('ready', async () => {
-	console.log(`Logged in as ${client.user.tag}!`);
-	client.user.setActivity('Use /play to play music.');
+botClient.on('ready', async () => {
+	logger.info(`Logged in as ${botClient.user.tag}!`);
+	botClient.user.setActivity('League of Legends', 0);
 
 	await registerCommands(clientId, token);
 });
 
-client.on('voiceStateUpdate', (oldState) => {
+botClient.on('voiceStateUpdate', (oldState) => {
 	const voiceChannel = oldState.channel;
 	if (voiceChannel && voiceChannel.members.size === 1) {
 		const connection = getVoiceConnection(voiceChannel.guild.id);
@@ -40,13 +45,13 @@ client.on('voiceStateUpdate', (oldState) => {
 	}
 });
 
-client.on('interactionCreate', async (interaction) => {
+botClient.on('interactionCreate', async (interaction) => {
 	if (!interaction.isCommand()) return;
 
 	const { commandName } = interaction;
 
 	if (commandName === 'play') {
-		await playCommand(interaction, client);
+		await playCommand(interaction, botClient);
 	} else if (commandName === 'queue') {
 		await queueCommand(interaction);
 	} else if (commandName === 'pause') {
@@ -57,13 +62,21 @@ client.on('interactionCreate', async (interaction) => {
 		await toggleLoopCommand(interaction);
 	} else if (commandName === 'stop') {
 		await stopCommand(interaction);
+	} else if (commandName === 'leave') {
+		await leaveCommand(interaction);
+	} else if (commandName === 'skip') {
+		await skipCommand(interaction);
+	} else if (commandName === 'previous') {
+		await previousCommand(interaction);
 	}
 });
 
-client.on('messageCreate', async (message) => {
+botClient.on('messageCreate', async (message) => {
 	if (message.content === 'reauth') {
 		await ReAuth();
 	}
 });
 
-client.login(token);
+botClient.login(token);
+
+module.exports.botClient = { botClient };

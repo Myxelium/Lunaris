@@ -30,8 +30,9 @@ const progressBar = (totalInMilliseconds, size, reset = false) => {
 		totalTimeText = totalTimeText.slice(3);
 	}
 
-	const progressBarString = `${elapsedTimeText} \`\`\`${progressText}${emptyProgressText}\`\`\` ${totalTimeText}`; // Creating and returning the bar
+	const progressBarString = `${elapsedTimeText} \`${progressText}${emptyProgressText}\` ${totalTimeText}`; // Creating and returning the bar
 
 	return { progressBarString, isDone: percentage === 1 };
 };
+
 module.exports.progressBar = progressBar;

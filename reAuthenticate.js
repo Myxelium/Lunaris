@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const play = require('play-dl');
 
 async function ReAuth() {
@@ -8,7 +9,7 @@ async function ReAuth() {
 			},
 		});
 
-		console.log(`Soudncloud Client ID: ${clientID}`);
+		console.log(`Soundcloud Client ID: ${clientID}`);
 	});
 
 	play.authorization();

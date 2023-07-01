@@ -32,5 +32,6 @@ module.exports = {
 		'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
 		'no-duplicate-imports': ['error', { includeExports: true }],
 		'eol-last': ['error', 'never'],
+		'linebreak-style': 0,
 	},
 };

@@ -14,7 +14,8 @@ async function getMusicStream(query) {
 		stream = await spotify.getStream(query);
 		songTitle = stream.title;
 		songDuration = stream.duration;
-		stream = stream.stream;
+		stream = stream?.stream;
+		type = StreamType.Opus;
 	} else if (query.includes('soundcloud.com')) {
 		stream = await soundcloud.getStream(query);
 		songTitle = stream.title;

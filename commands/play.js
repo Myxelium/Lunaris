@@ -27,9 +27,10 @@ async function playCommand(interaction) {
 
 	if (musicQueue.getQueue(interaction.guild.id).length > 0) {
 		musicQueue.removeFromQueue(interaction.guild.id);
+		musicQueue.addToQueue(interaction.guild.id, song, true);
+	} else {
+		musicQueue.addToQueue(interaction.guild.id, song);
 	}
-
-	musicQueue.addToQueue(interaction.guild.id, song);
 
 	musicPlayer(
 		interaction.guild.id,
