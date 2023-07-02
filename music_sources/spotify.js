@@ -1,14 +1,15 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
-// const playdl = require('play-dl');
-// const youtube = require('./youtube');
 
 const playdl = require('play-dl');
 const youtube = require('./youtube');
-const musicQueue = require('../musicQueue'); // Import the musicQueue module
+const musicQueue = require('../musicQueue');
 
 async function getStream(query, guildId) {
-	// Check if the query is a Spotify playlist
+	if (playdl.is_expired()) {
+		await playdl.refreshToken();
+	}
+
 	if (playdl.sp_validate(query) === 'playlist') {
 		let firstTrack = {};
 		// Get the playlist information
