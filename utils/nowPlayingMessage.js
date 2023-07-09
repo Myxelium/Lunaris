@@ -44,7 +44,7 @@ function nowPlayingMessage(interaction, song, prematureEnd = false) {
 						});
 					});
 				}
-			}, 1000);
+			}, 5000);
 
 			// Store the interval ID in the intervalMap
 			intervalMap.set(interaction.guild.id, inter);
